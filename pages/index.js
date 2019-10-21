@@ -1,54 +1,61 @@
 import React, { Component } from "react";
 import Link from "next/link";
+import {
+  makeWeatherRequest,
+  setWeatherLocalStorage,
+  getWeatherLocalStorage,
+} from "./helpers/helpers";
 
 class Index extends Component {
   constructor() {
     super();
+
+    this.state = {
+      weather: undefined,
+    };
   }
 
-  makeWeatherRequest = async location => {
-    const response = await fetch("/api/weather", {
-      method: "POST",
-      mode: "cors",
-      cache: "no-cache",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json; charset=utf-8",
-      },
-      redirect: "follow",
-      referrer: "no-referrer",
-      body: JSON.stringify(location),
-    });
+  getWeather = async (latitude, longitude) => {
+    let weather = getWeatherLocalStorage(
+      Number.parseFloat(latitude).toFixed(2),
+      Number.parseFloat(longitude).toFixed(2),
+    );
 
-    return await response.json();
+    if (!weather) {
+      ({ weather } = await fetchWeather({
+        lat: latitude,
+        long: longitude,
+      }));
+    }
+    return weather;
   };
 
-  handleClick = () => {
+  handleClick = async () => {
     navigator.geolocation.getCurrentPosition(
       async success => {
         const { latitude, longitude } = success.coords;
-        const { weather } = await this.makeWeatherRequest({
-          lat: latitude,
-          long: longitude,
-        });
-        console.log(`weather: `, JSON.parse(weather));
-
-        // write weather to local storage
-        // emit event for dom to get weather from local storage
-        // prevent fetch if weather already present
+        const weather = await this.getWeather(latitude, longitude);
+        this.setState({ weather });
       },
       error => {},
     );
-
-    // console.log(`JSON.parse(weather): `, JSON.parse(weather));
   };
 
   render() {
+    const { weather } = this.state;
     return (
       <div>
         <h1>API app</h1>
 
         <button onClick={this.handleClick}>fetch weather</button>
+
+        {weather && (
+          <div>
+            <h2>Weather in {weather.name}</h2>
+            <p>{weather.main.temp}</p>
+            <p>{weather.weather[0].description}</p>
+          </div>
+        )}
       </div>
     );
   }
