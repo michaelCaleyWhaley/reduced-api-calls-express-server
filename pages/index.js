@@ -1,6 +1,8 @@
 import React, { Component } from "react";
-import Link from "next/link";
+import Layout from "../components/Layout";
 import { getWeatherLocalStorage, fetchWeather } from "./helpers/helpers";
+
+import "./styles/index.scss";
 
 class Index extends Component {
   constructor() {
@@ -8,6 +10,7 @@ class Index extends Component {
 
     this.state = {
       weather: undefined,
+      loading: false,
     };
   }
 
@@ -24,23 +27,33 @@ class Index extends Component {
   };
 
   handleClick = async () => {
+    this.setState({ loading: true, weather: false });
     navigator.geolocation.getCurrentPosition(
       async success => {
         const { latitude, longitude } = success.coords;
         const weather = await this.getWeather(latitude, longitude);
-        this.setState({ weather });
+        this.setState({ weather, loading: false });
       },
-      error => {},
+      error => {
+        this.setState({ loading: false });
+      },
     );
   };
 
   render() {
-    const { weather } = this.state;
+    const { weather, loading } = this.state;
     return (
-      <div>
-        <h1>API app</h1>
+      <Layout>
+        <h1>LOCAL WEATHER</h1>
 
-        <button onClick={this.handleClick}>fetch weather</button>
+        <button className="weather-button" onClick={this.handleClick}>
+          fetch weather
+          <img
+            className="weather-button__icon"
+            src="/img/current-location.png"
+            alt="current location"
+          />
+        </button>
 
         {weather && (
           <div>
@@ -49,7 +62,12 @@ class Index extends Component {
             <p>{weather.weather[0].description}</p>
           </div>
         )}
-      </div>
+        {loading && (
+          <div>
+            <h2>LOADING...</h2>
+          </div>
+        )}
+      </Layout>
     );
   }
 }
