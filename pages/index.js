@@ -30,6 +30,9 @@ class Index extends Component {
   };
 
   handleClick = async () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not available");
+    }
     this.setState({ loading: true, weather: false });
     navigator.geolocation.getCurrentPosition(
       async success => {
