@@ -21,7 +21,7 @@ app.prepare().then(() => {
   });
 
   server.get("/test", (req, res) => {
-    res.send('test');
+    return app.render(req, res, "/test", "test");
   });
 
   server.all("*", (req, res) => {
