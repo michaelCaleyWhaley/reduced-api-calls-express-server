@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import Layout from "../components/Layout";
-import { getWeatherLocalStorage, fetchWeather } from "./helpers/helpers";
+import {
+  getWeatherLocalStorage,
+  fetchWeather,
+} from "../components/helpers/helpers";
 
 import "./styles/index.scss";
 
@@ -58,7 +61,7 @@ class Index extends Component {
         {weather && (
           <div>
             <h2>Weather in {weather.name}</h2>
-            <p>{weather.main.temp}</p>
+            <p>{weather.main.temp} &#176;</p>
             <p>{weather.weather[0].description}</p>
           </div>
         )}
