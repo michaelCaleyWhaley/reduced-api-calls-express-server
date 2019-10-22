@@ -1,10 +1,6 @@
 import React, { Component } from "react";
 import Link from "next/link";
-import {
-  makeWeatherRequest,
-  setWeatherLocalStorage,
-  getWeatherLocalStorage,
-} from "./helpers/helpers";
+import { getWeatherLocalStorage, fetchWeather } from "./helpers/helpers";
 
 class Index extends Component {
   constructor() {
@@ -16,16 +12,13 @@ class Index extends Component {
   }
 
   getWeather = async (latitude, longitude) => {
-    let weather = getWeatherLocalStorage(
-      Number.parseFloat(latitude).toFixed(2),
-      Number.parseFloat(longitude).toFixed(2),
-    );
+    let weather = getWeatherLocalStorage(latitude, longitude);
 
     if (!weather) {
-      ({ weather } = await fetchWeather({
+      weather = await fetchWeather({
         lat: latitude,
         long: longitude,
-      }));
+      });
     }
     return weather;
   };
